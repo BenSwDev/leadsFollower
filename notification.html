@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Follow-Up Reminder</title>
+    <style>
+        /* Body Styling */
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          padding: 20px;
+          background-color: #f0f3f7;
+          color: #333;
+        }
+
+        /* Title and Message */
+        h2 {
+          font-weight: bold;
+          color: #2c3e50;
+        }
+
+        #message {
+          color: #444;
+        }
+
+        /* Button Styles */
+        .buttons button, #sendWhatsappButton, #setRemindButton {
+          font-weight: 500;
+          border-radius: 6px;
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+          transition: transform 0.2s ease;
+        }
+
+        .buttons button:hover, #sendWhatsappButton:hover, #setRemindButton:hover {
+          transform: scale(1.05);
+        }
+
+        #sendWhatsappButton {
+          background-color: #25d366;
+          color: white;
+          border: none;
+        }
+
+        #okButton, #remindLaterButton {
+          background-color: #3498db;
+          color: white;
+          border: none;
+        }
+
+        #okButton:hover, #remindLaterButton:hover {
+          background-color: #2980b9;
+        }
+
+        /* Select Styling */
+        #remindOptions {
+          background-color: #ffffff;
+          border: 1px solid #ced4da;
+          padding: 5px;
+          border-radius: 4px;
+        }
+
+        /* Hidden Containers */
+        #whatsappMessageContainer, #remindOptionsContainer, #customDateTime {
+          display: none;
+          margin-top: 10px;
+          background-color: #fff;
+          padding: 10px;
+          border-radius: 6px;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+<h2 id="title">Follow-Up Reminder</h2>
+<p id="message">It's time to follow up with <span id="leadName"></span>.</p>
+<div>
+    <input type="checkbox" id="whatsappCheckbox"> Message via WhatsApp
+</div>
+<div id="whatsappMessageContainer">
+    <textarea id="whatsappMessage" rows="4" style="width:100%" placeholder="Enter your message here..."></textarea>
+    <button id="sendWhatsappButton">Send WhatsApp Message</button>
+</div>
+<div class="buttons">
+    <button id="okButton">OK</button>
+    <button id="remindLaterButton">Remind Me Later</button>
+</div>
+<div id="remindOptionsContainer">
+    <select id="remindOptions">
+        <option value="5">In 5 minutes</option>
+        <option value="10">In 10 minutes</option>
+        <option value="15">In 15 minutes</option>
+        <option value="30">In 30 minutes</option>
+        <option value="60">In 60 minutes</option>
+        <option value="custom">Pick date and time</option>
+    </select>
+    <input type="datetime-local" id="customDateTime">
+    <button id="setRemindButton">Set Reminder</button>
+</div>
+
+<!-- Custom Modal for messages -->
+<div id="modalOverlay">
+    <div id="modalBox">
+        <p id="modalMessage"></p>
+        <button id="modalOkButton">OK</button>
+    </div>
+</div>
+
+<script src="notificationRenderer.js"></script>
+</body>
+</html>

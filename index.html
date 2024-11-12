@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlRoot">
+<head>
+    <meta charset="UTF-8" />
+    <title data-i18n="title">Leads Manager</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+    <style>
+        /* General Styling */
+        body {
+          padding: 20px;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background-color: #f4f7fa;
+          color: #333;
+        }
+
+        /* Header */
+        h1, h2 {
+          font-weight: 700;
+          color: #2c3e50;
+        }
+
+        .language-switch .form-select {
+          background-color: #ffffff;
+          border: 1px solid #ced4da;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+          font-weight: 600;
+        }
+
+        /* Table Styling */
+        .table {
+          border-collapse: separate;
+          border-spacing: 0;
+          width: 100%;
+          background-color: #ffffff;
+          box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        .table thead {
+          background-color: #34495e;
+          color: #ffffff;
+        }
+
+        .table th, .table td {
+          padding: 12px;
+          text-align: center;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+          background-color: #f9fbfd;
+        }
+
+        /* Action Buttons */
+        .actions button {
+          margin-right: 5px;
+          font-weight: 500;
+          border-radius: 6px;
+        }
+
+        .actions .btn-success {
+          background-color: #28a745;
+          border-color: #28a745;
+        }
+
+        .actions .btn-warning {
+          background-color: #ffc107;
+          border-color: #ffc107;
+        }
+
+        .btn-success, .btn-secondary, .btn-primary, .btn-warning {
+          border: none;
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+          transition: transform 0.2s ease;
+        }
+
+        .btn-success:hover, .btn-secondary:hover, .btn-primary:hover, .btn-warning:hover {
+          transform: scale(1.05);
+        }
+
+        /* Modals */
+        .modal-content {
+          border-radius: 8px;
+          box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header, .modal-footer {
+          background-color: #f1f1f1;
+          border-bottom: none;
+        }
+
+        .modal-title {
+          color: #333;
+        }
+
+        /* Animation for Rows */
+        .details-row {
+          animation: fadeIn 0.3s;
+        }
+
+        .details-row.hide {
+          animation: fadeOut 0.3s;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+          from { opacity: 1; }
+          to   { opacity: 0; }
+        }
+
+        /* Alert and Confirmation */
+        #alertContainer {
+          z-index: 1055;
+        }
+
+        #confirmationContainer {
+          z-index: 1055;
+          display: none;
+          background-color: #ffffff;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        .modal-footer .btn {
+          border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<!-- Header and Language Dropdown -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 data-i18n="header">Leads Manager</h1>
+    <div class="language-switch">
+        <select id="languageDropdown" class="form-select form-select-sm" style="width: 100px;">
+            <option value="en" selected>EN</option>
+            <option value="he">HE</option>
+        </select>
+    </div>
+</div>
+
+<!-- Button to Open Add Lead Modal -->
+<button
+        type="button"
+        class="btn btn-success mb-3"
+        data-bs-toggle="modal"
+        data-bs-target="#addLeadModal"
+        data-i18n="addLead"
+>
+    Add Lead
+</button>
+
+<!-- Add Lead Modal -->
+<!-- [Add Lead Modal code remains unchanged] -->
+<div class="modal fade" id="addLeadModal" tabindex="-1" aria-labelledby="addLeadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="addLeadForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLeadModalLabel" data-i18n="addLead">Add Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label for="fullName" class="form-label" data-i18n="fullName">Full Name</label>
+                    <input type="text" class="form-control" id="fullName" placeholder="John Doe" required>
+                </div>
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label for="phone" class="form-label" data-i18n="phone">Phone</label>
+                    <input type="text" class="form-control" id="phone" placeholder="1234567890" >
+                </div>
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label" data-i18n="email">Email</label>
+                    <input type="email" class="form-control" id="email" placeholder="john@example.com" >
+                </div>
+                <!-- Details (Optional Initial Detail) -->
+                <div class="mb-3">
+                    <label for="details" class="form-label" data-i18n="details">Details</label>
+                    <input type="text" class="form-control" id="details" placeholder="Initial Meeting">
+                </div>
+                <!-- Source -->
+                <div class="mb-3">
+                    <label for="source" class="form-label" data-i18n="source">Source</label>
+                    <input type="text" class="form-control" id="source" placeholder="Website">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">Close</button>
+                <button type="submit" class="btn btn-success" data-i18n="saveChanges">Save Lead</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Lead Modal -->
+<div class="modal fade" id="editLeadModal" tabindex="-1" aria-labelledby="editLeadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editLeadForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLeadModalLabel" data-i18n="editLead">Edit Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Hidden Field for Lead ID -->
+                <input type="hidden" id="editLeadId">
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label for="editFullName" class="form-label" data-i18n="fullName">Full Name</label>
+                    <input type="text" class="form-control" id="editFullName" required>
+                </div>
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label for="editPhone" class="form-label" data-i18n="phone">Phone</label>
+                    <input type="text" class="form-control" id="editPhone" required>
+                </div>
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="editEmail" class="form-label" data-i18n="email">Email</label>
+                    <input type="email" class="form-control" id="editEmail" required>
+                </div>
+                <!-- Source -->
+                <div class="mb-3">
+                    <label for="editSource" class="form-label" data-i18n="source">Source</label>
+                    <input type="text" class="form-control" id="editSource">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">Close</button>
+                <button type="submit" class="btn btn-warning" data-i18n="saveChanges">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Detail Modal -->
+<div class="modal fade" id="editDetailModal" tabindex="-1" aria-labelledby="editDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="editDetailForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDetailModalLabel" data-i18n="editDetail">Edit Detail</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Hidden Fields for Lead ID and Detail ID -->
+                <input type="hidden" id="editDetailLeadId">
+                <input type="hidden" id="editDetailId">
+                <!-- Detail Text -->
+                <div class="mb-3">
+                    <label for="editDetailText" class="form-label" data-i18n="detailText">Detail Text</label>
+                    <input type="text" class="form-control" id="editDetailText" required>
+                </div>
+                <!-- Follow-Up Container -->
+                <div class="mb-3" id="editDetailFollowUpContainer">
+                    <!-- Follow-Up options will be inserted here dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">Close</button>
+                <button type="submit" class="btn btn-warning" data-i18n="saveChanges">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Active Leads Table -->
+<h2 data-i18n="activeLeads">Active Leads</h2>
+<table class="table table-striped" id="activeLeadsTable">
+    <thead>
+    <tr>
+        <!-- Removed ID column -->
+        <th data-i18n="fullName">Full Name</th>
+        <th data-i18n="phone">Phone</th>
+        <th data-i18n="email">Email</th>
+        <th data-i18n="details">Details</th>
+        <th data-i18n="source">Source</th>
+        <th data-i18n="addedAt">Added At</th>
+        <th data-i18n="lastContact">Last Contact</th>
+        <th data-i18n="followUp">Follow Up</th>
+        <th data-i18n="actions">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Active leads will be dynamically populated here -->
+    </tbody>
+</table>
+
+<!-- Inactive Leads Table -->
+<h2 data-i18n="inactiveLeads">Inactive Leads</h2>
+<table class="table table-striped" id="inactiveLeadsTable">
+    <thead>
+    <tr>
+        <!-- Removed ID column -->
+        <th data-i18n="fullName">Full Name</th>
+        <th data-i18n="phone">Phone</th>
+        <th data-i18n="email">Email</th>
+        <th data-i18n="details">Details</th>
+        <th data-i18n="source">Source</th>
+        <th data-i18n="addedAt">Added At</th>
+        <th data-i18n="lastContact">Last Contact</th>
+        <th data-i18n="followUp">Follow Up</th>
+        <th data-i18n="actions">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Inactive leads will be dynamically populated here -->
+    </tbody>
+</table>
+
+<!-- Bootstrap JS -->
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+></script>
+
+<!-- Alert Container -->
+<div
+        id="alertContainer"
+        class="position-fixed top-0 end-0 p-3"
+        style="z-index: 1055;"
+></div>
+
+<!-- Confirmation Container -->
+<div
+        id="confirmationContainer"
+        class="position-fixed top-50 start-50 translate-middle p-4"
+        style="
+    z-index: 1055;
+    display: none;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  "
+>
+    <p id="confirmationMessage"></p>
+    <div class="text-end">
+        <button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                id="cancelConfirmationBtn"
+                data-i18n="cancel"
+        >
+            Cancel
+        </button>
+        <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                id="confirmConfirmationBtn"
+                data-i18n="confirm"
+        >
+            Confirm
+        </button>
+    </div>
+</div>
+
+<!-- Renderer Script -->
+<script src="renderer.js"></script>
+</body>
+</html>
