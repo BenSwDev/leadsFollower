@@ -1,16 +1,16 @@
 # Node modules
 node_modules/
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
 # Build directories
 dist/
 build/
+
+# Lead capture directory
+lead-capture/
+
+# Logs
+logs/
+*.log
 
 # OS generated files
 .DS_Store
@@ -23,9 +23,3 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
-
-# Vercel
-.vercel/
-
-# Environment variables
-.env
