@@ -1,0 +1,55 @@
+{
+  "name": "leads-manager",
+  "version": "1.0.0",
+  "description": "A simple app to manage leads.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Ben Swissa",
+  "license": "MIT",
+  "build": {
+    "appId": "com.leads.follower",
+    "productName": "LeadsFollower",
+    "files": [
+      "**/*",
+      "!**/*.map"
+    ],
+    "directories": {
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.business",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
+    },
+    "linux": {
+      "target": "AppImage",
+      "category": "Utility",
+      "maintainer": "Ben Swissa <your-email@example.com>",
+      "description": "A simple app to manage leads.",
+      "icon": "build/icon.png"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "BenSwDev",
+      "repo": "leadsFollower"
+    }
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "electron-updater": "^6.3.9",
+    "mongodb": "^5.7.0"
+  },
+  "devDependencies": {
+    "electron": "^33.1.0",
+    "electron-builder": "^25.1.8"
+  }
+}

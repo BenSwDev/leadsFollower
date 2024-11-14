@@ -272,6 +272,40 @@
     </div>
 </div>
 
+<!-- Search and Filter Controls for Active Leads -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <select id="activeSearchField" class="form-select form-select-sm">
+            <option value="fullName">Full Name</option>
+            <option value="phone">Phone</option>
+            <option value="email">Email</option>
+            <option value="source">Source</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <input type="text" id="activeSearchInput" class="form-control form-control-sm" placeholder="Search...">
+    </div>
+    <div class="col-md-4">
+        <button type="button" id="activeClearFilters" class="btn btn-secondary btn-sm">Clear Filters</button>
+    </div>
+</div>
+
+<!-- Additional Filters for Active Leads -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <select id="activeFilterSource" class="form-select form-select-sm">
+            <option value="">All Sources</option>
+            <!-- Dynamic options will be populated via renderer.js -->
+        </select>
+    </div>
+    <div class="col-md-4">
+        <input type="date" id="activeFilterLastContact" class="form-control form-control-sm" placeholder="Filter by Last Contact">
+    </div>
+    <div class="col-md-4">
+        <input type="date" id="activeFilterFollowUp" class="form-control form-control-sm" placeholder="Filter by Follow-Up">
+    </div>
+</div>
+
 <!-- Active Leads Table -->
 <h2 data-i18n="activeLeads">Active Leads</h2>
 <table class="table table-striped" id="activeLeadsTable">
@@ -293,6 +327,40 @@
     <!-- Active leads will be dynamically populated here -->
     </tbody>
 </table>
+
+<!-- Search and Filter Controls for Inactive Leads -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <select id="inactiveSearchField" class="form-select form-select-sm">
+            <option value="fullName">Full Name</option>
+            <option value="phone">Phone</option>
+            <option value="email">Email</option>
+            <option value="source">Source</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <input type="text" id="inactiveSearchInput" class="form-control form-control-sm" placeholder="Search...">
+    </div>
+    <div class="col-md-4">
+        <button type="button" id="inactiveClearFilters" class="btn btn-secondary btn-sm">Clear Filters</button>
+    </div>
+</div>
+
+<!-- Additional Filters for Inactive Leads -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <select id="inactiveFilterSource" class="form-select form-select-sm">
+            <option value="">All Sources</option>
+            <!-- Dynamic options will be populated via renderer.js -->
+        </select>
+    </div>
+    <div class="col-md-4">
+        <input type="date" id="inactiveFilterLastContact" class="form-control form-control-sm" placeholder="Filter by Last Contact">
+    </div>
+    <div class="col-md-4">
+        <input type="date" id="inactiveFilterFollowUp" class="form-control form-control-sm" placeholder="Filter by Follow-Up">
+    </div>
+</div>
 
 <!-- Inactive Leads Table -->
 <h2 data-i18n="inactiveLeads">Inactive Leads</h2>
