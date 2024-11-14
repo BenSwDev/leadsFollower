@@ -6,9 +6,9 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "build:win": "electron-builder --win",
-    "build:linux": "electron-builder --linux",
-    "build:mac": "electron-builder --mac"
+    "build:win": "electron-builder --win --publish=never",
+    "build:linux": "electron-builder --linux --publish=never",
+    "build:mac": "electron-builder --mac --publish=never"
   },
   "author": "Ben Swissa",
   "license": "MIT",
@@ -23,7 +23,8 @@
       "buildResources": "build"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "artifactName": "LeadsFollower-${version}.exe"
     },
     "mac": {
       "target": "dmg",
@@ -31,15 +32,17 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist"
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "artifactName": "LeadsFollower-${version}-arm64.dmg"
     },
     "linux": {
       "target": "AppImage",
       "category": "Utility",
       "maintainer": "Ben Swissa <your-email@example.com>",
       "description": "A simple app to manage leads.",
-      "icon": "build/icon.png"
-    },
+      "icon": "build/icon.png",
+      "artifactName": "LeadsFollower-${version}.AppImage"
+    }
   },
   "dependencies": {
     "auto-launch": "^5.0.6",
