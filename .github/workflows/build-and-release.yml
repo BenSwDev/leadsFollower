@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Build Windows Installer
-        run: npm run build -- --win
+        run: npm run build -- --win --publish=never
 
       - name: List dist directory
         run: dir dist\
@@ -50,7 +50,7 @@ jobs:
         run: npm install
 
       - name: Build Linux Installer
-        run: npm run build -- --linux
+        run: npm run build -- --linux --publish=never
 
       - name: List dist directory
         run: ls dist/
@@ -76,7 +76,7 @@ jobs:
         run: npm install
 
       - name: Build macOS Installer
-        run: npm run build -- --mac
+        run: npm run build -- --mac --publish=never
 
       - name: List dist directory
         run: ls dist/
