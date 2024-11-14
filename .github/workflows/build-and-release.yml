@@ -13,10 +13,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
 
@@ -26,8 +26,11 @@ jobs:
       - name: Build Windows Installer
         run: npm run build -- --win
 
+      - name: List dist directory
+        run: dir dist\
+
       - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Windows Installer
           path: dist/*.exe
@@ -36,10 +39,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
 
@@ -49,8 +52,11 @@ jobs:
       - name: Build Linux Installer
         run: npm run build -- --linux
 
+      - name: List dist directory
+        run: ls dist/
+
       - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Linux Installer
           path: dist/*.AppImage
@@ -59,10 +65,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: '16'
 
@@ -72,8 +78,11 @@ jobs:
       - name: Build macOS Installer
         run: npm run build -- --mac
 
+      - name: List dist directory
+        run: ls dist/
+
       - name: Upload macOS Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: macOS Installer
           path: dist/*.dmg
@@ -83,19 +92,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Windows Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: Windows Installer
           path: ./artifacts/windows
 
       - name: Download Linux Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: Linux Installer
           path: ./artifacts/linux
 
       - name: Download macOS Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: macOS Installer
           path: ./artifacts/macos
