@@ -1,0 +1,112 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on tags like v1.0.0, v1.0.1, etc.
+
+permissions:
+  contents: write  # Grants write access to repository contents, necessary for creating releases
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Windows Installer
+        run: npm run build -- --win
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows Installer
+          path: dist/*.exe
+
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Linux Installer
+        run: npm run build -- --linux
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux Installer
+          path: dist/*.AppImage
+
+  build_macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build macOS Installer
+        run: npm run build -- --mac
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macOS Installer
+          path: dist/*.dmg
+
+  release:
+    needs: [build_windows, build_linux, build_macos]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: Windows Installer
+          path: ./artifacts/windows
+
+      - name: Download Linux Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: Linux Installer
+          path: ./artifacts/linux
+
+      - name: Download macOS Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: macOS Installer
+          path: ./artifacts/macos
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref }}
+          name: Release ${{ github.ref }}
+          files: |
+            ./artifacts/windows/*.exe
+            ./artifacts/linux/*.AppImage
+            ./artifacts/macos/*.dmg
