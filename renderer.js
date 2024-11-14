@@ -266,330 +266,418 @@ function confirmAction(message) {
   });
 }
 
-// Function to render leads in the table
+// Function to render leads in the table with search and filters
 function renderLeads() {
-  activeLeadsTableBody.innerHTML = '';
-  inactiveLeadsTableBody.innerHTML = '';
-  const currentTime = new Date();
+    activeLeadsTableBody.innerHTML = '';
+    inactiveLeadsTableBody.innerHTML = '';
+    const currentTime = new Date();
 
-  leads.forEach((lead) => {
-    const row = document.createElement('tr');
+    // Apply search and filters
+    const filteredLeads = leads.filter(lead => {
+        // Determine if lead is active or inactive
+        const isActive = lead.active !== false;
 
-    // Check if follow-up is overdue
-    if (lead.followUp) {
-      const followUpTime = new Date(lead.followUp);
-      if (followUpTime < currentTime && !lead.followUpCompleted) {
-        row.classList.add('table-danger');
-      }
-    }
-
-    // Full Name
-    const nameCell = document.createElement('td');
-    nameCell.textContent = lead.fullName;
-    row.appendChild(nameCell);
-
-    // Phone
-    const phoneCell = document.createElement('td');
-    phoneCell.textContent = lead.phone;
-    row.appendChild(phoneCell);
-
-    // Email
-    const emailCell = document.createElement('td');
-    emailCell.textContent = lead.email;
-    row.appendChild(emailCell);
-
-    // Details (Button to toggle details)
-    const detailsCell = document.createElement('td');
-    const detailsButton = document.createElement('button');
-    detailsButton.type = 'button';
-    detailsButton.classList.add('btn', 'btn-info', 'btn-sm');
-    const detailsCount = lead.details ? lead.details.length : 0;
-    detailsButton.textContent = `Show ${detailsCount} Details`;
-    detailsButton.addEventListener('click', () => {
-      // Close any other open details
-      document.querySelectorAll('.details-row').forEach(dr => {
-        if (dr.id !== `details-row-${lead._id}`) {
-          dr.classList.add('hide');
-          setTimeout(() => {
-            dr.style.display = 'none';
-          }, 300);
-        }
-      });
-      // Toggle current details
-      const detailsRow = document.getElementById(`details-row-${lead._id}`);
-      if (detailsRow.style.display === 'none') {
-        detailsRow.style.display = '';
-        detailsButton.textContent = `Hide ${detailsCount} Details`;
-      } else {
-        detailsRow.classList.add('hide');
-        setTimeout(() => {
-          detailsRow.style.display = 'none';
-        }, 300);
-        detailsButton.textContent = `Show ${detailsCount} Details`;
-      }
-    });
-    detailsCell.appendChild(detailsButton);
-    row.appendChild(detailsCell);
-
-    // Source
-    const sourceCell = document.createElement('td');
-    sourceCell.textContent = lead.source;
-    row.appendChild(sourceCell);
-
-    // Added At
-    const addedAtCell = document.createElement('td');
-    addedAtCell.textContent = formatDateTime(lead.addedAt);
-    row.appendChild(addedAtCell);
-
-    // Last Contact
-    const lastContactCell = document.createElement('td');
-    lastContactCell.textContent = formatDateTime(lead.lastContact);
-    row.appendChild(lastContactCell);
-
-    // Follow Up (Edit Follow-Up button)
-    const followUpCell = document.createElement('td');
-
-    // Display follow-up time or 'None'
-    const followUpText = document.createElement('span');
-    followUpText.textContent = lead.followUp ? formatDateTime(lead.followUp) : 'None';
-    followUpCell.appendChild(followUpText);
-
-    // Edit Follow-Up button
-    const editFollowUpButton = document.createElement('button');
-    editFollowUpButton.type = 'button';
-    editFollowUpButton.classList.add('btn', 'btn-sm', 'btn-secondary', 'ms-2');
-    editFollowUpButton.textContent = translations[currentLanguage].editFollowUp;
-    editFollowUpButton.addEventListener('click', () => {
-      openFollowUpModal(lead);
-    });
-    followUpCell.appendChild(editFollowUpButton);
-
-    row.appendChild(followUpCell);
-
-    // Actions (Edit, Delete, WhatsApp, Activate/Deactivate)
-    const actionsCell = document.createElement('td');
-    actionsCell.classList.add('actions');
-
-    // Edit Button
-    const editButton = document.createElement('button');
-    editButton.type = 'button';
-    editButton.classList.add('btn', 'btn-warning', 'btn-sm');
-    editButton.textContent = translations[currentLanguage].edit;
-    editButton.addEventListener('click', () => {
-      openEditModal(lead._id);
-    });
-    actionsCell.appendChild(editButton);
-
-    // Delete Button
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
-    deleteButton.textContent = translations[currentLanguage].delete;
-    deleteButton.addEventListener('click', () => {
-      deleteLeadHandler(lead._id);
-    });
-    actionsCell.appendChild(deleteButton);
-
-    // WhatsApp Button
-    const whatsappButton = document.createElement('button');
-    whatsappButton.type = 'button';
-    whatsappButton.classList.add('btn', 'btn-success', 'btn-sm');
-    whatsappButton.textContent = translations[currentLanguage].whatsapp;
-    whatsappButton.addEventListener('click', () => {
-      initiateWhatsApp(lead.phone, lead.fullName);
-    });
-    actionsCell.appendChild(whatsappButton);
-
-    // Activate/Deactivate Button
-    const statusButton = document.createElement('button');
-    statusButton.type = 'button';
-    statusButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-    statusButton.textContent = lead.active !== false ? 'Deactivate' : 'Activate';
-    statusButton.addEventListener('click', async () => {
-      try {
-        await window.api.updateLead({ id: lead._id, active: !lead.active });
-        await loadLeads();
-        showAlert(`Lead ${lead.active !== false ? 'deactivated' : 'activated'} successfully.`, 'success');
-      } catch (error) {
-        console.error('Error updating lead status:', error);
-        showAlert(translations[currentLanguage].failedToUpdateLeadStatus, 'danger');
-      }
-    });
-    actionsCell.appendChild(statusButton);
-
-    row.appendChild(actionsCell);
-
-    // Details Row
-    const detailsRow = document.createElement('tr');
-    detailsRow.id = `details-row-${lead._id}`;
-    detailsRow.style.display = 'none';
-    detailsRow.classList.add('details-row');
-
-    const detailsCellRow = document.createElement('td');
-    detailsCellRow.colSpan = 9; // Adjust based on number of columns
-
-    // Details Table
-    const detailsTable = document.createElement('table');
-    detailsTable.classList.add('table', 'table-bordered');
-
-    const detailsTbody = document.createElement('tbody');
-
-    if (lead.details && lead.details.length > 0) {
-      lead.details.forEach((detail, index) => {
-        const detailRow = document.createElement('tr');
-
-        const detailTextCell = document.createElement('td');
-        detailTextCell.textContent = detail.text;
-        detailRow.appendChild(detailTextCell);
-
-        const detailTimestampCell = document.createElement('td');
-        detailTimestampCell.textContent = formatDateTime(detail.timestamp);
-        detailRow.appendChild(detailTimestampCell);
-
-        const detailActionsCell = document.createElement('td');
-
-        // Only the last detail can be edited/deleted
-        if (index === lead.details.length - 1) {
-          // Edit Detail Button
-          const editDetailButton = document.createElement('button');
-          editDetailButton.type = 'button';
-          editDetailButton.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
-          editDetailButton.textContent = translations[currentLanguage].edit;
-          editDetailButton.addEventListener('click', () => {
-            openEditDetailModal(lead._id, detail.id, detail.text, lead.followUp);
-          });
-          detailActionsCell.appendChild(editDetailButton);
-
-          // Delete Detail Button
-          const deleteDetailButton = document.createElement('button');
-          deleteDetailButton.type = 'button';
-          deleteDetailButton.classList.add('btn', 'btn-sm', 'btn-danger', 'ms-2');
-          deleteDetailButton.textContent = translations[currentLanguage].delete;
-          deleteDetailButton.addEventListener('click', () => {
-            deleteDetail(lead._id, detail.id);
-          });
-          detailActionsCell.appendChild(deleteDetailButton);
-        }
-
-        detailRow.appendChild(detailActionsCell);
-
-        detailsTbody.appendChild(detailRow);
-      });
-    } else {
-      const noDetailsRow = document.createElement('tr');
-      const noDetailsCell = document.createElement('td');
-      noDetailsCell.colSpan = 3;
-      noDetailsCell.textContent = translations[currentLanguage].noDetailsAvailable;
-      noDetailsRow.appendChild(noDetailsCell);
-      detailsTbody.appendChild(noDetailsRow);
-    }
-
-    // Add Detail Form
-    const addDetailRow = document.createElement('tr');
-    const addDetailCell = document.createElement('td');
-    addDetailCell.colSpan = 3;
-
-    const addDetailForm = document.createElement('form');
-    addDetailForm.classList.add('d-flex', 'align-items-center');
-
-    const detailInput = document.createElement('input');
-    detailInput.type = 'text';
-    detailInput.classList.add('form-control', 'form-control-sm', 'me-2');
-    detailInput.placeholder = translations[currentLanguage].addNewDetail;
-    addDetailForm.appendChild(detailInput);
-
-    // Follow-Up Options
-    const followUpSelect = document.createElement('select');
-    followUpSelect.classList.add('form-select', 'form-select-sm', 'me-2');
-    followUpSelect.innerHTML = `
-      <option value="">No Follow-Up</option>
-      <option value="5">${translations[currentLanguage].inXMinutes.replace('{minutes}', '5')}</option>
-      <option value="10">${translations[currentLanguage].inXMinutes.replace('{minutes}', '10')}</option>
-      <option value="15">${translations[currentLanguage].inXMinutes.replace('{minutes}', '15')}</option>
-      <option value="30">${translations[currentLanguage].inXMinutes.replace('{minutes}', '30')}</option>
-      <option value="60">${translations[currentLanguage].inXMinutes.replace('{minutes}', '60')}</option>
-      <option value="120">${translations[currentLanguage].inXMinutes.replace('{minutes}', '120')}</option>
-      <option value="180">${translations[currentLanguage].inXMinutes.replace('{minutes}', '180')}</option>
-      <option value="custom">${translations[currentLanguage].pickDateTime}</option>
-    `;
-    addDetailForm.appendChild(followUpSelect);
-
-    const customDateTimeInput = document.createElement('input');
-    customDateTimeInput.type = 'datetime-local';
-    customDateTimeInput.classList.add('form-control', 'form-control-sm', 'me-2');
-    customDateTimeInput.style.display = 'none';
-    addDetailForm.appendChild(customDateTimeInput);
-
-    followUpSelect.addEventListener('change', () => {
-      if (followUpSelect.value === 'custom') {
-        customDateTimeInput.style.display = 'block';
-      } else {
-        customDateTimeInput.style.display = 'none';
-      }
-    });
-
-    const addDetailButton = document.createElement('button');
-    addDetailButton.type = 'submit';
-    addDetailButton.classList.add('btn', 'btn-primary', 'btn-sm');
-    addDetailButton.textContent = translations[currentLanguage].add;
-    addDetailForm.appendChild(addDetailButton);
-
-    addDetailForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const detailText = detailInput.value.trim();
-      let followUpTime = null;
-
-      if (followUpSelect.value === 'custom') {
-        if (customDateTimeInput.value) {
-          followUpTime = new Date(customDateTimeInput.value).toISOString();
-          if (new Date(followUpTime) <= new Date()) {
-            showAlert(translations[currentLanguage].followUpTimeInFuture, 'danger');
-            return;
-          }
+        // Apply search
+        let searchField, searchQuery;
+        if (isActive) {
+            searchField = activeSearchField;
+            searchQuery = activeSearchQuery.toLowerCase();
         } else {
-          showAlert(translations[currentLanguage].pleaseSelectValidDateTime, 'danger');
-          return;
+            searchField = inactiveSearchField;
+            searchQuery = inactiveSearchQuery.toLowerCase();
         }
-      } else if (followUpSelect.value) {
-        const minutes = parseInt(followUpSelect.value);
-        followUpTime = new Date(Date.now() + minutes * 60000).toISOString();
-      }
 
-      if (detailText) {
-        try {
-          await window.api.addDetail(lead._id, { text: detailText }, followUpTime);
-          await loadLeads();
-          showAlert(translations[currentLanguage].detailAdded, 'success');
-          // Keep the details section open
-          const detailsRow = document.getElementById(`details-row-${lead._id}`);
-          detailsRow.style.display = '';
-        } catch (error) {
-          console.error('Error adding detail:', error);
-          showAlert(translations[currentLanguage].failedToAddDetail, 'danger');
+        if (searchQuery) {
+            if (!lead[searchField] || !lead[searchField].toLowerCase().includes(searchQuery)) {
+                return false;
+            }
         }
-      } else {
-        showAlert(translations[currentLanguage].detailTextRequired, 'danger');
-      }
+
+        // Apply Source filter
+        if (isActive) {
+            if (activeFilterSource && lead.source !== activeFilterSource) {
+                return false;
+            }
+        } else {
+            if (inactiveFilterSource && lead.source !== inactiveFilterSource) {
+                return false;
+            }
+        }
+
+        // Apply Last Contact filter
+        if (isActive) {
+            if (activeFilterLastContact) {
+                const lastContactDate = new Date(lead.lastContact);
+                const filterDate = new Date(activeFilterLastContact);
+                if (lastContactDate.toDateString() !== filterDate.toDateString()) {
+                    return false;
+                }
+            }
+        } else {
+            if (inactiveFilterLastContact) {
+                const lastContactDate = new Date(lead.lastContact);
+                const filterDate = new Date(inactiveFilterLastContact);
+                if (lastContactDate.toDateString() !== filterDate.toDateString()) {
+                    return false;
+                }
+            }
+        }
+
+        // Apply Follow-Up filter
+        if (isActive) {
+            if (activeFilterFollowUp) {
+                if (lead.followUp) {
+                    const followUpDate = new Date(lead.followUp);
+                    const filterDate = new Date(activeFilterFollowUp);
+                    if (followUpDate.toDateString() !== filterDate.toDateString()) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            if (inactiveFilterFollowUp) {
+                if (lead.followUp) {
+                    const followUpDate = new Date(lead.followUp);
+                    const filterDate = new Date(inactiveFilterFollowUp);
+                    if (followUpDate.toDateString() !== filterDate.toDateString()) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     });
 
-    addDetailCell.appendChild(addDetailForm);
-    addDetailRow.appendChild(addDetailCell);
-    detailsTbody.appendChild(addDetailRow);
+    // Populate Source filters
+    populateSourceFilters();
 
-    detailsTable.appendChild(detailsTbody);
-    detailsCellRow.appendChild(detailsTable);
-    detailsRow.appendChild(detailsCellRow);
+    // Sort leads by Added At descending
+    filteredLeads.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
 
-    // Append the row to the appropriate table
-    if (lead.active !== false) {
-      // Default to active if 'active' field is missing
-      activeLeadsTableBody.appendChild(row);
-      activeLeadsTableBody.appendChild(detailsRow);
-    } else {
-      inactiveLeadsTableBody.appendChild(row);
-      inactiveLeadsTableBody.appendChild(detailsRow);
-    }
-  });
+    filteredLeads.forEach((lead) => {
+        const isActive = lead.active !== false;
+        const row = document.createElement('tr');
+
+        // Check if follow-up is overdue
+        if (lead.followUp) {
+            const followUpTime = new Date(lead.followUp);
+            if (followUpTime < currentTime && !lead.followUpCompleted) {
+                row.classList.add('table-danger');
+            }
+        }
+
+        // Full Name
+        const nameCell = document.createElement('td');
+        nameCell.textContent = lead.fullName;
+        row.appendChild(nameCell);
+
+        // Phone
+        const phoneCell = document.createElement('td');
+        phoneCell.textContent = lead.phone;
+        row.appendChild(phoneCell);
+
+        // Email
+        const emailCell = document.createElement('td');
+        emailCell.textContent = lead.email;
+        row.appendChild(emailCell);
+
+        // Details (Button to toggle details)
+        const detailsCell = document.createElement('td');
+        const detailsButton = document.createElement('button');
+        detailsButton.type = 'button';
+        detailsButton.classList.add('btn', 'btn-info', 'btn-sm');
+        const detailsCount = lead.details ? lead.details.length : 0;
+        detailsButton.textContent = `Show ${detailsCount} Details`;
+        detailsButton.addEventListener('click', () => {
+            // Close any other open details
+            document.querySelectorAll('.details-row').forEach(dr => {
+                if (dr.id !== `details-row-${lead._id}`) {
+                    dr.classList.add('hide');
+                    setTimeout(() => {
+                        dr.style.display = 'none';
+                    }, 300);
+                }
+            });
+            // Toggle current details
+            const detailsRow = document.getElementById(`details-row-${lead._id}`);
+            if (detailsRow.style.display === 'none') {
+                detailsRow.style.display = '';
+                detailsButton.textContent = `Hide ${detailsCount} Details`;
+            } else {
+                detailsRow.classList.add('hide');
+                setTimeout(() => {
+                    detailsRow.style.display = 'none';
+                }, 300);
+                detailsButton.textContent = `Show ${detailsCount} Details`;
+            }
+        });
+        detailsCell.appendChild(detailsButton);
+        row.appendChild(detailsCell);
+
+        // Source
+        const sourceCell = document.createElement('td');
+        sourceCell.textContent = lead.source;
+        row.appendChild(sourceCell);
+
+        // Added At
+        const addedAtCell = document.createElement('td');
+        addedAtCell.textContent = formatDateTime(lead.addedAt);
+        row.appendChild(addedAtCell);
+
+        // Last Contact
+        const lastContactCell = document.createElement('td');
+        lastContactCell.textContent = formatDateTime(lead.lastContact);
+        row.appendChild(lastContactCell);
+
+        // Follow Up (Edit Follow-Up button)
+        const followUpCell = document.createElement('td');
+
+        // Display follow-up time or 'None'
+        const followUpText = document.createElement('span');
+        followUpText.textContent = lead.followUp ? formatDateTime(lead.followUp) : 'None';
+        followUpCell.appendChild(followUpText);
+
+        // Edit Follow-Up button
+        const editFollowUpButton = document.createElement('button');
+        editFollowUpButton.type = 'button';
+        editFollowUpButton.classList.add('btn', 'btn-sm', 'btn-secondary', 'ms-2');
+        editFollowUpButton.textContent = translations[currentLanguage].editFollowUp;
+        editFollowUpButton.addEventListener('click', () => {
+            openFollowUpModal(lead);
+        });
+        followUpCell.appendChild(editFollowUpButton);
+
+        row.appendChild(followUpCell);
+
+        // Actions (Edit, Delete, WhatsApp, Activate/Deactivate)
+        const actionsCell = document.createElement('td');
+        actionsCell.classList.add('actions');
+
+        // Edit Button
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.classList.add('btn', 'btn-warning', 'btn-sm');
+        editButton.textContent = translations[currentLanguage].edit;
+        editButton.addEventListener('click', () => {
+            openEditModal(lead._id);
+        });
+        actionsCell.appendChild(editButton);
+
+        // Delete Button
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
+        deleteButton.textContent = translations[currentLanguage].delete;
+        deleteButton.addEventListener('click', () => {
+            deleteLeadHandler(lead._id);
+        });
+        actionsCell.appendChild(deleteButton);
+
+        // WhatsApp Button
+        const whatsappButton = document.createElement('button');
+        whatsappButton.type = 'button';
+        whatsappButton.classList.add('btn', 'btn-success', 'btn-sm');
+        whatsappButton.textContent = translations[currentLanguage].whatsapp;
+        whatsappButton.addEventListener('click', () => {
+            initiateWhatsApp(lead.phone, lead.fullName);
+        });
+        actionsCell.appendChild(whatsappButton);
+
+        // Activate/Deactivate Button
+        const statusButton = document.createElement('button');
+        statusButton.type = 'button';
+        statusButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+        statusButton.textContent = lead.active !== false ? 'Deactivate' : 'Activate';
+        statusButton.addEventListener('click', async () => {
+            try {
+                await window.api.updateLead({ id: lead._id, active: !lead.active });
+                await loadLeads();
+                showAlert(`Lead ${lead.active !== false ? 'deactivated' : 'activated'} successfully.`, 'success');
+            } catch (error) {
+                console.error('Error updating lead status:', error);
+                showAlert(translations[currentLanguage].failedToUpdateLeadStatus, 'danger');
+            }
+        });
+        actionsCell.appendChild(statusButton);
+
+        row.appendChild(actionsCell);
+
+        // Details Row
+        const detailsRow = document.createElement('tr');
+        detailsRow.id = `details-row-${lead._id}`;
+        detailsRow.style.display = 'none';
+        detailsRow.classList.add('details-row');
+
+        const detailsCellRow = document.createElement('td');
+        detailsCellRow.colSpan = 9; // Adjust based on number of columns
+
+        // Details Table
+        const detailsTable = document.createElement('table');
+        detailsTable.classList.add('table', 'table-bordered');
+
+        const detailsTbody = document.createElement('tbody');
+
+        if (lead.details && lead.details.length > 0) {
+            lead.details.forEach((detail, index) => {
+                const detailRow = document.createElement('tr');
+
+                const detailTextCell = document.createElement('td');
+                detailTextCell.textContent = detail.text;
+                detailRow.appendChild(detailTextCell);
+
+                const detailTimestampCell = document.createElement('td');
+                detailTimestampCell.textContent = formatDateTime(detail.timestamp);
+                detailRow.appendChild(detailTimestampCell);
+
+                const detailActionsCell = document.createElement('td');
+
+                // Only the last detail can be edited/deleted
+                if (index === lead.details.length - 1) {
+                    // Edit Detail Button
+                    const editDetailButton = document.createElement('button');
+                    editDetailButton.type = 'button';
+                    editDetailButton.classList.add('btn', 'btn-sm', 'btn-warning', 'ms-2');
+                    editDetailButton.textContent = translations[currentLanguage].edit;
+                    editDetailButton.addEventListener('click', () => {
+                        openEditDetailModal(lead._id, detail.id, detail.text, lead.followUp);
+                    });
+                    detailActionsCell.appendChild(editDetailButton);
+
+                    // Delete Detail Button
+                    const deleteDetailButton = document.createElement('button');
+                    deleteDetailButton.type = 'button';
+                    deleteDetailButton.classList.add('btn', 'btn-sm', 'btn-danger', 'ms-2');
+                    deleteDetailButton.textContent = translations[currentLanguage].delete;
+                    deleteDetailButton.addEventListener('click', () => {
+                        deleteDetail(lead._id, detail.id);
+                    });
+                    detailActionsCell.appendChild(deleteDetailButton);
+                }
+
+                detailRow.appendChild(detailActionsCell);
+
+                detailsTbody.appendChild(detailRow);
+            });
+        } else {
+            const noDetailsRow = document.createElement('tr');
+            const noDetailsCell = document.createElement('td');
+            noDetailsCell.colSpan = 3;
+            noDetailsCell.textContent = translations[currentLanguage].noDetailsAvailable;
+            noDetailsRow.appendChild(noDetailsCell);
+            detailsTbody.appendChild(noDetailsRow);
+        }
+
+        // Add Detail Form
+        const addDetailRow = document.createElement('tr');
+        const addDetailCell = document.createElement('td');
+        addDetailCell.colSpan = 3;
+
+        const addDetailForm = document.createElement('form');
+        addDetailForm.classList.add('d-flex', 'align-items-center');
+
+        const detailInput = document.createElement('input');
+        detailInput.type = 'text';
+        detailInput.classList.add('form-control', 'form-control-sm', 'me-2');
+        detailInput.placeholder = translations[currentLanguage].addNewDetail;
+        addDetailForm.appendChild(detailInput);
+
+        // Follow-Up Options
+        const followUpSelect = document.createElement('select');
+        followUpSelect.classList.add('form-select', 'form-select-sm', 'me-2');
+        followUpSelect.innerHTML = `
+            <option value="">No Follow-Up</option>
+            <option value="5">${translations[currentLanguage].inXMinutes.replace('{minutes}', '5')}</option>
+            <option value="10">${translations[currentLanguage].inXMinutes.replace('{minutes}', '10')}</option>
+            <option value="15">${translations[currentLanguage].inXMinutes.replace('{minutes}', '15')}</option>
+            <option value="30">${translations[currentLanguage].inXMinutes.replace('{minutes}', '30')}</option>
+            <option value="60">${translations[currentLanguage].inXMinutes.replace('{minutes}', '60')}</option>
+            <option value="120">${translations[currentLanguage].inXMinutes.replace('{minutes}', '120')}</option>
+            <option value="180">${translations[currentLanguage].inXMinutes.replace('{minutes}', '180')}</option>
+            <option value="custom">${translations[currentLanguage].pickDateTime}</option>
+        `;
+        addDetailForm.appendChild(followUpSelect);
+
+        const customDateTimeInput = document.createElement('input');
+        customDateTimeInput.type = 'datetime-local';
+        customDateTimeInput.classList.add('form-control', 'form-control-sm', 'me-2');
+        customDateTimeInput.style.display = 'none';
+        addDetailForm.appendChild(customDateTimeInput);
+
+        followUpSelect.addEventListener('change', () => {
+            if (followUpSelect.value === 'custom') {
+                customDateTimeInput.style.display = 'block';
+            } else {
+                customDateTimeInput.style.display = 'none';
+            }
+        });
+
+        const addDetailButton = document.createElement('button');
+        addDetailButton.type = 'submit';
+        addDetailButton.classList.add('btn', 'btn-primary', 'btn-sm');
+        addDetailButton.textContent = translations[currentLanguage].add;
+        addDetailForm.appendChild(addDetailButton);
+
+        addDetailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const detailText = detailInput.value.trim();
+            let followUpTime = null;
+
+            if (followUpSelect.value === 'custom') {
+                if (customDateTimeInput.value) {
+                    followUpTime = new Date(customDateTimeInput.value).toISOString();
+                    if (new Date(followUpTime) <= new Date()) {
+                        showAlert(translations[currentLanguage].followUpTimeInFuture, 'danger');
+                        return;
+                    }
+                } else {
+                    showAlert(translations[currentLanguage].pleaseSelectValidDateTime, 'danger');
+                    return;
+                }
+            } else if (followUpSelect.value) {
+                const minutes = parseInt(followUpSelect.value);
+                followUpTime = new Date(Date.now() + minutes * 60000).toISOString();
+            }
+
+            if (detailText) {
+                try {
+                    await window.api.addDetail(lead._id, { text: detailText }, followUpTime);
+                    await loadLeads();
+                    showAlert(translations[currentLanguage].detailAdded, 'success');
+                    // Keep the details section open
+                    const detailsRow = document.getElementById(`details-row-${lead._id}`);
+                    detailsRow.style.display = '';
+                } catch (error) {
+                    console.error('Error adding detail:', error);
+                    showAlert(translations[currentLanguage].failedToAddDetail, 'danger');
+                }
+            } else {
+                showAlert(translations[currentLanguage].detailTextRequired, 'danger');
+            }
+        });
+
+        addDetailCell.appendChild(addDetailForm);
+        addDetailRow.appendChild(addDetailCell);
+        detailsTbody.appendChild(addDetailRow);
+
+        detailsTable.appendChild(detailsTbody);
+        detailsCellRow.appendChild(detailsTable);
+        detailsRow.appendChild(detailsCellRow);
+
+        // Append the row to the appropriate table
+        if (isActive) {
+            // Default to active if 'active' field is missing
+            activeLeadsTableBody.appendChild(row);
+            activeLeadsTableBody.appendChild(detailsRow);
+        } else {
+            inactiveLeadsTableBody.appendChild(row);
+            inactiveLeadsTableBody.appendChild(detailsRow);
+        }
+    });
 }
 
 // Function to format date and time
@@ -613,14 +701,16 @@ function formatDateTimeLocal(dateTime) {
 
 // Function to load leads from server
 async function loadLeads() {
-  try {
-    leads = await window.api.getLeads();
-    renderLeads();
-  } catch (err) {
-    console.error('Error loading leads:', err);
-    showAlert('Failed to load leads.', 'danger');
-  }
+    try {
+        leads = await window.api.getLeads();
+        renderLeads();
+        populateSourceFilters(); // Populate Source filters after loading leads
+    } catch (err) {
+        console.error('Error loading leads:', err);
+        showAlert('Failed to load leads.', 'danger');
+    }
 }
+
 
 // Add Lead
 addLeadForm.addEventListener('submit', async (e) => {
@@ -1102,19 +1192,162 @@ function showFollowUpNotification(lead) {
 
 // Initialize the app
 window.addEventListener("DOMContentLoaded", () => {
-  applyTranslations();
-  loadLeads();
-
-  // Start checking for due follow-ups every minute
-  checkForDueFollowUps();
-  setInterval(checkForDueFollowUps, 6000);
-
-  // Listen for reload-leads message from main process
-  window.api.onReloadLeads(() => {
+    applyTranslations();
     loadLeads();
-  });
+
+    // Start checking for due follow-ups every minute
+    checkForDueFollowUps();
+    setInterval(checkForDueFollowUps, 6000);
+
+    // Listen for reload-leads message from main process
+    window.api.onReloadLeads(() => {
+        loadLeads();
+    });
 });
 
 window.api.onDatabaseChange((change) => {
   loadLeads();
+});
+
+// Search and Filter State
+let activeSearchField = 'fullName';
+let activeSearchQuery = '';
+let inactiveSearchField = 'fullName';
+let inactiveSearchQuery = '';
+
+let activeFilterSource = '';
+let activeFilterLastContact = '';
+let activeFilterFollowUp = '';
+
+let inactiveFilterSource = '';
+let inactiveFilterLastContact = '';
+let inactiveFilterFollowUp = '';
+
+// Function to populate Source filter options
+function populateSourceFilters() {
+    const sources = [...new Set(leads.map(lead => lead.source).filter(source => source))];
+    const activeFilterSourceSelect = document.getElementById('activeFilterSource');
+    const inactiveFilterSourceSelect = document.getElementById('inactiveFilterSource');
+
+    // Clear existing options except the first
+    activeFilterSourceSelect.innerHTML = '<option value="">All Sources</option>';
+    inactiveFilterSourceSelect.innerHTML = '<option value="">All Sources</option>';
+
+    sources.forEach(source => {
+        const option = document.createElement('option');
+        option.value = source;
+        option.textContent = source;
+        activeFilterSourceSelect.appendChild(option.cloneNode(true));
+        inactiveFilterSourceSelect.appendChild(option.cloneNode(true));
+    });
+}
+
+// Event Listeners for Active Leads Search and Filters
+document.getElementById('activeSearchField').addEventListener('change', (e) => {
+    activeSearchField = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('activeSearchInput').addEventListener('input', (e) => {
+    activeSearchQuery = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('activeFilterSource').addEventListener('change', (e) => {
+    activeFilterSource = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('activeFilterLastContact').addEventListener('change', (e) => {
+    activeFilterLastContact = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('activeFilterFollowUp').addEventListener('change', (e) => {
+    activeFilterFollowUp = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('activeClearFilters').addEventListener('click', () => {
+    document.getElementById('activeSearchInput').value = '';
+    activeSearchQuery = '';
+    document.getElementById('activeFilterSource').value = '';
+    activeFilterSource = '';
+    document.getElementById('activeFilterLastContact').value = '';
+    activeFilterLastContact = '';
+    document.getElementById('activeFilterFollowUp').value = '';
+    activeFilterFollowUp = '';
+    loadLeads();
+});
+
+// Event Listeners for Inactive Leads Search and Filters
+document.getElementById('inactiveSearchField').addEventListener('change', (e) => {
+    inactiveSearchField = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('inactiveSearchInput').addEventListener('input', (e) => {
+    inactiveSearchQuery = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('inactiveFilterSource').addEventListener('change', (e) => {
+    inactiveFilterSource = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('inactiveFilterLastContact').addEventListener('change', (e) => {
+    inactiveFilterLastContact = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('inactiveFilterFollowUp').addEventListener('change', (e) => {
+    inactiveFilterFollowUp = e.target.value;
+    loadLeads();
+});
+
+document.getElementById('inactiveClearFilters').addEventListener('click', () => {
+    document.getElementById('inactiveSearchInput').value = '';
+    inactiveSearchQuery = '';
+    document.getElementById('inactiveFilterSource').value = '';
+    inactiveFilterSource = '';
+    document.getElementById('inactiveFilterLastContact').value = '';
+    inactiveFilterLastContact = '';
+    document.getElementById('inactiveFilterFollowUp').value = '';
+    inactiveFilterFollowUp = '';
+    loadLeads();
+});
+
+// Auto-Updater UI Handling
+window.api.onUpdateAvailable((event, info) => {
+    showAlert('Update available. Downloading now...', 'info', 5000);
+});
+
+window.api.onUpdateNotAvailable((event, info) => {
+    console.log('No updates available.');
+});
+
+window.api.onUpdateError((event, err) => {
+    showAlert('Error in auto-updater: ' + err, 'danger', 5000);
+});
+
+window.api.onDownloadProgress((event, progressObj) => {
+    const log_message = "Download speed: " + progressObj.bytesPerSecond;
+    console.log(log_message);
+    console.log(`Downloaded ${progressObj.percent}%`);
+    // Optionally, implement a progress bar in the UI
+});
+
+window.api.onUpdateDownloaded((event, info) => {
+    showAlert('Update downloaded. It will be installed on quit. Restart now?', 'success', 5000);
+    // Optionally, prompt the user to restart the app
+    const restartButton = document.createElement('button');
+    restartButton.textContent = 'Restart Now';
+    restartButton.classList.add('btn', 'btn-primary', 'ms-2');
+    restartButton.addEventListener('click', () => {
+        window.api.quitAndInstall();
+    });
+    const alertContainer = document.getElementById('alertContainer');
+    const alertDiv = alertContainer.lastChild;
+    alertDiv.appendChild(restartButton);
 });
