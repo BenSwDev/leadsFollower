@@ -9,7 +9,8 @@
     "build:win": "electron-builder --win --publish=never",
     "build:linux": "electron-builder --linux --publish=never",
     "build:mac": "electron-builder --mac --publish=never",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "echo \"No tests specified\" && exit 0",
+    "dist": "electron-builder"
   },
   "author": "Ben Swissa",
   "license": "MIT",

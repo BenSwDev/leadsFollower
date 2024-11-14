@@ -98,13 +98,19 @@ function createTray() {
 // Initialize MongoDB Connection
 async function initializeMongoDB() {
   try {
-    dbClient = new MongoClient(MONGO_URI);
+    dbClient = new MongoClient(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
     await dbClient.connect();
     console.log('Connected to MongoDB Atlas');
   } catch (err) {
     console.error('Error connecting to MongoDB Atlas:', err);
+    if (mainWindow) {
+      mainWindow.webContents.send('db-connection-error', err.message);
+    }
+    new Notification({ title: 'Database Connection Error', body: 'Failed to connect to the database. The application will exit.' }).show();
+    app.quit(); // Exit the application if the database connection is critical
   }
 }
+
 
 // Auto-launch setup
 const autoLauncher = new AutoLaunch({
