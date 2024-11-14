@@ -6,6 +6,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const AutoLaunch = require('auto-launch');
 const { autoUpdater } = require('electron-updater'); // Add this line
 const log = require('electron-log'); // Add this line
+const fs = require('fs');
 
 // Configure logging
 autoUpdater.logger = log;
@@ -23,6 +24,15 @@ let dbClient;
 let mainWindow;
 let tray;
 let changeStream;
+
+function setCustomCachePath() {
+  const cachePath = path.join(app.getPath('userData'), 'cache');
+  if (!fs.existsSync(cachePath)) {
+    fs.mkdirSync(cachePath);
+  }
+  app.setPath('cache', cachePath);
+}
+
 
 // Function to create the main window
 function createWindow() {
@@ -103,6 +113,7 @@ const autoLauncher = new AutoLaunch({
 });
 
 app.whenReady().then(async () => {
+  setCustomCachePath(); // Add this line
   await initializeMongoDB();
   watchDatabaseChanges();
 
@@ -113,13 +124,15 @@ app.whenReady().then(async () => {
 
   createWindow();
 
-  // Auto-updater setup
+  // Auto-updater setup with correct repository details
   autoUpdater.setFeedURL({
     provider: 'github',
-    owner: 'BenSwDev', // Replace with your GitHub username
-    repo: 'leadsFollower', // Replace with your repository name
+    owner: 'BenSwDev', // Ensure this is your actual GitHub username
+    repo: 'leadsFollower', // Change to your actual repository name
     private: false, // Set to true if the repo is private
   });
+
+
 
   autoUpdater.on('checking-for-update', () => {
     log.info('Checking for update...');

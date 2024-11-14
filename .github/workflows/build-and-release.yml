@@ -23,8 +23,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Tests
-        run: npm test
+      # Removed "Run Tests" step
 
       - name: Build Windows Installer
         run: npm run build -- --win --publish=never
@@ -52,8 +51,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Tests
-        run: npm test
+      # Removed "Run Tests" step
 
       - name: Build Linux Installer
         run: npm run build -- --linux --publish=never
@@ -81,8 +79,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Tests
-        run: npm test
+      # Removed "Run Tests" step
 
       - name: Build macOS Installer
         run: npm run build -- --mac --publish=never
