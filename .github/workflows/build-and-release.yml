@@ -18,10 +18,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'
 
       - name: Install Dependencies
         run: npm install
+
+      - name: Run Tests
+        run: npm test
 
       - name: Build Windows Installer
         run: npm run build -- --win --publish=never
@@ -44,10 +47,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'
 
       - name: Install Dependencies
         run: npm install
+
+      - name: Run Tests
+        run: npm test
 
       - name: Build Linux Installer
         run: npm run build -- --linux --publish=never
@@ -70,10 +76,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '20'
 
       - name: Install Dependencies
         run: npm install
+
+      - name: Run Tests
+        run: npm test
 
       - name: Build macOS Installer
         run: npm run build -- --mac --publish=never
