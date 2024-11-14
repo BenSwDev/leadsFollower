@@ -101,7 +101,6 @@ const autoLauncher = new AutoLaunch({
   path: app.getPath('exe'),
 });
 
-// Create the window and initialize the app
 app.whenReady().then(async () => {
   await initializeMongoDB();
   watchDatabaseChanges();
@@ -113,64 +112,47 @@ app.whenReady().then(async () => {
 
   createWindow();
 
-    // Auto-updater setup
-    autoUpdater.setFeedURL({
-        provider: 'github',
-        owner: 'benswissa', // Replace with your GitHub username
-        repo: 'leadsFollower', // Replace with your repository name
-        private: false, // Set to true if the repo is private
-    });
+  // Auto-updater setup
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'BenSwDev', // Replace with your GitHub username
+    repo: 'leadsFollower', // Replace with your repository name
+    private: false, // Set to true if the repo is private
+  });
 
-    autoUpdater.on('checking-for-update', () => {
-        log.info('Checking for update...');
-    });
+  autoUpdater.on('checking-for-update', () => {
+    log.info('Checking for update...');
+  });
 
-    autoUpdater.on('update-available', (info) => {
-        log.info('Update available.');
-        mainWindow.webContents.send('update_available', info);
-    });
+  autoUpdater.on('update-available', (info) => {
+    log.info('Update available.');
+    mainWindow.webContents.send('update_available', info);
+  });
 
-    autoUpdater.on('update-not-available', (info) => {
-        log.info('Update not available.');
-        mainWindow.webContents.send('update_not_available', info);
-    });
+  autoUpdater.on('update-not-available', (info) => {
+    log.info('Update not available.');
+    mainWindow.webContents.send('update_not_available', info);
+  });
 
-    autoUpdater.on('error', (err) => {
-        log.error('Error in auto-updater:', err);
-        mainWindow.webContents.send('update_error', err);
-    });
+  autoUpdater.on('error', (err) => {
+    log.error('Error in auto-updater:', err);
+    mainWindow.webContents.send('update_error', err);
+  });
 
-    autoUpdater.on('download-progress', (progressObj) => {
-        log.info(`Download speed: ${progressObj.bytesPerSecond}`);
-        log.info(`Downloaded ${progressObj.percent}%`);
-        log.info(`(${progressObj.transferred}/${progressObj.total})`);
-        mainWindow.webContents.send('download_progress', progressObj);
-    });
+  autoUpdater.on('download-progress', (progressObj) => {
+    log.info(`Download speed: ${progressObj.bytesPerSecond}`);
+    log.info(`Downloaded ${progressObj.percent}%`);
+    log.info(`(${progressObj.transferred}/${progressObj.total})`);
+    mainWindow.webContents.send('download_progress', progressObj);
+  });
 
-    autoUpdater.on('update-downloaded', (info) => {
-        log.info('Update downloaded');
-        mainWindow.webContents.send('update_downloaded', info);
-    });
+  autoUpdater.on('update-downloaded', (info) => {
+    log.info('Update downloaded');
+    mainWindow.webContents.send('update_downloaded', info);
+  });
 
-    // Check for updates after the app is ready
-    app.whenReady().then(async () => {
-        await initializeMongoDB();
-        watchDatabaseChanges();
-
-        // Enable auto-launch
-        autoLauncher.isEnabled().then((isEnabled) => {
-            if (!isEnabled) autoLauncher.enable();
-        });
-
-        createWindow();
-
-        // Initiate auto-updater
-        autoUpdater.checkForUpdatesAndNotify();
-
-        app.on('activate', () => {
-            if (BrowserWindow.getAllWindows().length === 0) createWindow();
-        });
-    });
+  // Initiate auto-updater
+  autoUpdater.checkForUpdatesAndNotify();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
