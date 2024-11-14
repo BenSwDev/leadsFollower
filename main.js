@@ -15,7 +15,8 @@ log.info('App starting...');
 
 // mongodb+srv://benswissa:LeoJ2018!!!$$$@shlomi.ij7z5.mongodb.net/?retryWrites=true&w=majority&appName=shlomi
 require('dotenv').config();
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = mongodb+srv://benswissa:LeoJ2018!!!$$$@shlomi.ij7z5.mongodb.net/?retryWrites=true&w=majority&appName=shlomi
+// process.env.MONGO_URI;
 
 const DB_NAME = 'leadsDB';
 const COLLECTION_NAME = 'leads';
