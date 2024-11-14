@@ -1,4 +1,4 @@
-name: Build macOS Installer
+name: Build Windows Installer
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  build-macos:
-    runs-on: macos-latest
+  build-windows:
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Repository
@@ -21,11 +21,11 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Build macOS Installer
+      - name: Build Windows Installer
         run: npm run build
 
-      - name: Upload macOS Installer
+      - name: Upload Windows Installer
         uses: actions/upload-artifact@v2
         with:
-          name: macos-installer
-          path: dist/*.dmg
+          name: windows-installer
+          path: dist/*.exe
