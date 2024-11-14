@@ -38,6 +38,6 @@ contextBridge.exposeInMainWorld('api', {
   onUpdateError: (callback) => ipcRenderer.on('update_error', callback),
   onDownloadProgress: (callback) => ipcRenderer.on('download_progress', callback),
   onUpdateDownloaded: (callback) => ipcRenderer.on('update_downloaded', callback),
-  quitAndInstall: () => autoUpdater.quitAndInstall(), // Add this line
+quitAndInstall: () => ipcRenderer.send('quit-and-install'),
 
 });

@@ -15,6 +15,11 @@
   "license": "MIT",
   "build": {
     "appId": "com.leads.follower",
+    "publish": {
+      "provider": "github",
+      "owner": "BenSwDev",
+      "repo": "leadsFollower"
+    },
     "productName": "LeadsFollower",
     "files": [
       "**/*",

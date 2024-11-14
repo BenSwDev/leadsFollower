@@ -124,16 +124,6 @@ app.whenReady().then(async () => {
 
   createWindow();
 
-  // Auto-updater setup with correct repository details
-  autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'BenSwDev', // Ensure this is your actual GitHub username
-    repo: 'leadsFollower', // Change to your actual repository name
-    private: false, // Set to true if the repo is private
-  });
-
-
-
   autoUpdater.on('checking-for-update', () => {
     log.info('Checking for update...');
   });
@@ -428,3 +418,7 @@ async function watchDatabaseChanges() {
     console.error('Error watching database changes:', err);
   }
 }
+
+ipcMain.on('quit-and-install', () => {
+  autoUpdater.quitAndInstall();
+});
